@@ -1,0 +1,39 @@
+package com.unical.webapplication.back.controller;
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.unical.webapplication.back.config.SecurityUtility;
+import com.unical.webapplication.back.model.Utente;
+import com.unical.webapplication.back.service.UtenteService;
+
+@RestController
+@RequestMapping("/api/users")
+public class UtenteController {
+
+    private final UtenteService utenteService;
+
+    public UtenteController(UtenteService utenteService) {
+        this.utenteService = utenteService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Utente utente) {
+        if(utenteService.registerUser(utente)) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        return ResponseEntity.badRequest().body("Registration failed");
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Utente> getCurrentUser() {
+        Utente user = (Utente) SecurityUtility.getCurrentUser();
+        return ResponseEntity.ok(user);
+    }
+}
