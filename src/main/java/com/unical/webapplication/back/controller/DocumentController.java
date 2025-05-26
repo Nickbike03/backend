@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,6 +28,7 @@ import com.unical.webapplication.back.service.DocumentService;
 @RestController
 @RequestMapping("/api/documents") // potremi modificare d a questo punto per poter permettere il login in base al
                                   // ruolo che si ricopre
+@CrossOrigin(origins = "http://localhost:4200")            
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -41,7 +43,7 @@ public class DocumentController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDocument(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("user_id") int userId,
+            //@RequestParam("user_id") int userId,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("course") String course) {
@@ -49,8 +51,9 @@ public class DocumentController {
         //fare i controlli sia sullo user_id per vedere che l'utente è registrato
         // controllo per vedere tutti i dettagli sono inseriti
         // vedere di implementare un DTO per la gestione del body degli oggetti passati tramite la query
-
+        
         try {
+            int userId = 3;
             Document document = new Document(
                     userId,
                     name,
