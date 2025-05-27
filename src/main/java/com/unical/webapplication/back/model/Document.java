@@ -1,5 +1,8 @@
 package com.unical.webapplication.back.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Document {
     private int id;
     private int user_id;

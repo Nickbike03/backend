@@ -78,15 +78,17 @@ public class DocumentController {
             if (document == null) {
                 return ResponseEntity.notFound().build();
             }
+             HttpHeaders headers = new HttpHeaders();
+             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF); // application.pdf mi permette di avere un anteprima del
-                                                               // documento --> SOLO SE PDF
-            headers.setContentDisposition(ContentDisposition.attachment()
-                    .filename(document.getName())
-                    .build());
+            
+            // headers.setContentType(MediaType.APPLICATION_PDF); // application.pdf mi permette di avere un anteprima del
+            //                                                    // documento --> SOLO SE PDF
+            // headers.setContentDisposition(ContentDisposition.attachment()
+            //         .filename(document.getName())
+            //         .build());
 
-            return new ResponseEntity<>(document.getData(), headers, HttpStatus.OK);
+            return new ResponseEntity<>(document, headers, HttpStatus.OK);
         } catch (SQLException e) {
             return ResponseEntity.internalServerError().body("Error retrieving document: " + e.getMessage());
         }
@@ -100,7 +102,7 @@ public class DocumentController {
             Document document = documentService.downloadDocument(id);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM); // ritorna il documento come un insieme di byte
+            headers.setContentType(MediaType.APPLICATION_JSON   ); // ritorna il documento come un json
             headers.setContentDisposition(ContentDisposition.attachment()
                     .filename(document.getName())
                     .build());
