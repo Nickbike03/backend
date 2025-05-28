@@ -15,18 +15,16 @@ import com.unical.webapplication.back.persistence.DBManager;
 @Repository
 public class UtenteDaoImpl implements IUtenteDao {
 
-    private final DBManager dbManager;
 
-    public UtenteDaoImpl() throws SQLException {
-        this.dbManager = DBManager.getInstance();
-    }
-
+    
     @Override
     public Utente findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM utente WHERE email = ?";
         
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql,
-                PreparedStatement.RETURN_GENERATED_KEYS))
+        try(Connection conn = DBManager.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql,
+         PreparedStatement.RETURN_GENERATED_KEYS))
+                 
         {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -42,10 +40,7 @@ public class UtenteDaoImpl implements IUtenteDao {
     public boolean saveUtente(Utente utente) {
         String sql = "INSERT INTO utente (name, surname, email, password, faculty, role) VALUES (?, ?, ?, ?, ?, ?)";
         
-        try (
-            Connection conn = dbManager.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = DBManager.getConnection();PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1, utente.getName());
             pstmt.setString(2, utente.getSurname());
             pstmt.setString(3, utente.getEmail());

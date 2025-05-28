@@ -3,6 +3,7 @@ package com.unical.webapplication.back.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +35,10 @@ public class UtenteController {
     @GetMapping("/me")
     public ResponseEntity<Utente> getCurrentUser() {
         Utente user = (Utente) SecurityUtility.getCurrentUser();
-        return ResponseEntity.ok(user);
+        if(user != null){
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.status(401).build();
     }
+
 }

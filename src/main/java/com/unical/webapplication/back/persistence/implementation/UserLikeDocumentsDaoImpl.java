@@ -16,18 +16,16 @@ import com.unical.webapplication.back.persistence.DBManager;
 @Repository
 public class UserLikeDocumentsDaoImpl implements ILikeDocumentDAO{
 
-    private final DBManager dbManager;
 
-    public UserLikeDocumentsDaoImpl() throws SQLException {
-        this.dbManager = DBManager.getInstance();
-    }
+
+   
 
     @Override
     public List<Integer> getLikesByUser(int userId) throws SQLException {
         List<Integer> likedDocuments = new ArrayList<>();
         String sql = "SELECT document_id FROM user_like_documents WHERE user_id = ?";
         
-        try (Connection conn = DBManager.getInstance().getConnection();
+        try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, userId);
@@ -44,7 +42,7 @@ public class UserLikeDocumentsDaoImpl implements ILikeDocumentDAO{
     public boolean insertLike(int userId, int documentId) throws SQLException {
         String sql = "INSERT INTO user_like_documents (user_id, document_id) VALUES (?, ?)";
         
-        try (Connection conn = DBManager.getInstance().getConnection();
+        try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, userId);

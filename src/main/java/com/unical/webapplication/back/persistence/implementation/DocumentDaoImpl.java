@@ -1,5 +1,6 @@
 package com.unical.webapplication.back.persistence.implementation;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,19 +17,16 @@ import com.unical.webapplication.back.persistence.DBManager;
 
 @Repository
 public class DocumentDaoImpl implements IDocumentDAO {
-    private final DBManager dbManager;
 
-    public DocumentDaoImpl() throws SQLException {
-        this.dbManager = DBManager.getInstance();
-    }
+   
 
     @Override
     public boolean insertDocument(Document document) throws SQLException {
         String sql = "INSERT INTO document (user_id, name, description, data, course, size, validated, validated_admin) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql,
-                PreparedStatement.RETURN_GENERATED_KEYS)) { // PreparedStateman.RETURN_GENERATED_KEYS --> ritorna la
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) { // PreparedStateman.RETURN_GENERATED_KEYS --> ritorna la
                                                             // chiave univoca generata per il docuemnto appena creato
 
             stmt.setInt(1, document.getUser_id());
@@ -64,7 +62,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
     @Override
     public Document findDocumentByID(int documentId) throws SQLException {
         String sql = "SELECT * FROM document WHERE id = ?";
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, documentId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -88,7 +86,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
     @Override
     public Document downloadDocumentById(int documentId) throws SQLException {
         String sql = "SELECT name, data FROM document WHERE id = ?";
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, documentId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -106,7 +104,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
     @Override
     public Document findValidDocumentById(int documentId) throws SQLException {
         String sql = "SELECT * FROM document WHERE id = ? AND validated = TRUE";
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, documentId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -132,7 +130,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
         List<Document> documents = new ArrayList<>();
         String sql = "SELECT * FROM document";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql);
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
@@ -154,7 +152,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
     @Override
     public Document findNotValidDocumentById(int documentId) throws SQLException {
         String sql = "SELECT * FROM document WHERE id = ? AND validated = FALSE";
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, documentId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -192,7 +190,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
         List<Document> documents = new ArrayList<>();
         String sql = "SELECT * FROM document WHERE validated = ?";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setBoolean(1, validated);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -218,7 +216,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
         List<Document> documents = new ArrayList<>();
         String sql = "SELECT id, user_id, validated_admin, name, description, course, size, validated FROM document WHERE user_id = ?";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, userId);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -245,7 +243,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
         List<Document> documents = new ArrayList<>();
         String sql = "SELECT id, user_id, validated_admin, name, description, course, size, validated FROM document WHERE LOWER(course) = LOWER(?)";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setString(1, course);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -271,7 +269,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
     public boolean deleteDocument(int documentId) throws SQLException {
         String sql = "DELETE FROM document WHERE id = ?";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, documentId);
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -282,7 +280,7 @@ public class DocumentDaoImpl implements IDocumentDAO {
     public boolean updateValid(int documentId, int adminId) throws SQLException {
         String sql = "UPDATE document SET validated = TRUE, validated_admin = ? WHERE id = ?";
 
-        try (PreparedStatement stmt = dbManager.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, adminId);
             stmt.setInt(2, documentId);
 
