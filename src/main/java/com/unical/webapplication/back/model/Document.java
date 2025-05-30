@@ -4,19 +4,22 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Document {
-    private int id;
-    private int user_id;
-    private int validated_admin;
+    private int id; // indice che mi viene fornito dal database ed è UNIVOCO. 
+    private int user_id; // indice che indica l'utente che ha caricato il documento
+    private int validated_admin; // indice che indica quale amministratore ha saltato il documento
     private String name;
     private String description;
-    private byte[] data; 
+    private byte[] data;
     private String course;
     private int size;
-    private boolean validated;
+    private boolean validated; // campo boolenano che indica se il documento è stato validato. se il documento
+                               // è validato posso avere anche chi è l'admin che lo ha validato
 
-    public Document(){}
+    public Document() {
+    }
 
-    public Document(int user_id, String name, String description, byte[] data, String course, int size, boolean validated) {
+    public Document(int user_id, String name, String description, byte[] data, String course, int size,
+            boolean validated) {
         this.user_id = user_id;
         this.name = name;
         this.description = description;
@@ -34,7 +37,6 @@ public class Document {
         this.size = size;
         this.validated = validated;
     }
-
 
     public int getId() {
         return id;
@@ -100,16 +102,12 @@ public class Document {
         this.validated = validated;
     }
 
-
     public byte[] getData() {
         return data;
     }
-
 
     public void setData(byte[] data) {
         this.data = data;
     }
 
-    
 }
-

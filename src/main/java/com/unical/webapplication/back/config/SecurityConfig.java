@@ -22,110 +22,72 @@ public class SecurityConfig {
     private final UtenteService utenteService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-  public SecurityConfig(UtenteService utenteService, BCryptPasswordEncoder passwordEncoder) {
+    public SecurityConfig(UtenteService utenteService, BCryptPasswordEncoder passwordEncoder) {
         this.utenteService = utenteService;
-        this.passwordEncoder = passwordEncoder; // <-- Inietta l'istanza
+        this.passwordEncoder = passwordEncoder;
     }
 
+    //Impostazione che mi permette di disabilitare tutti i controlli per il login e riporta l'applicazione ad una versione senza sicurezza
     // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //     http
-    //         .csrf(csrf -> csrf.disable())
-    //         .authorizeHttpRequests(auth -> auth
-    //             .anyRequest().permitAll()
-    //         )
-    //         // se vuoi la form-login di default (opzionale)
-    //         .httpBasic(Customizer.withDefaults());
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+    // Exception {
+    // http
+    // .csrf(csrf -> csrf.disable())
+    // .authorizeHttpRequests(auth -> auth
+    // .anyRequest().permitAll()
+    // )
+    // // se vuoi la form-login di default (opzionale)
+    // .httpBasic(Customizer.withDefaults());
 
-    //     return http.build();
-    // }
-
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //     http
-    //         .csrf(csrf -> csrf.disable())
-    //         .authorizeHttpRequests(auth -> auth
-    //             .requestMatchers("/api/users/register").permitAll()
-    //             .requestMatchers("/api/users/login").permitAll()
-    //             .anyRequest().authenticated()
-    //         )
-    //         .formLogin(form -> form
-    //             .loginProcessingUrl("/api/users/login")
-    //             .usernameParameter("email")
-    //             .passwordParameter("password")
-    //             .successHandler((request, response, authentication) -> {
-    //                 response.setStatus(200);
-    //                 response.getWriter().write("Login successful");
-    //             })
-    //             .failureHandler((request, response, exception) -> {
-    //                 response.setStatus(401);
-    //                 response.getWriter().write("Login failed: " + exception.getMessage());
-    //             })
-    //         )
-    //         .logout(logout -> logout
-    //             .logoutUrl("/api/users/logout")
-    //             .addLogoutHandler(new HeaderWriterLogoutHandler(
-    //                 new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.COOKIES)
-    //             ))
-    //             .logoutSuccessHandler((request, response, authentication) -> {
-    //                 response.setStatus(200);
-    //                 response.getWriter().write("Logout successful");
-    //             })
-    //             .deleteCookies("JSESSIONID")
-    //         )
-    //         .httpBasic(httpBasic -> httpBasic.disable());
-
-    //     return http.build();
+    // return http.build();
     // }
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/users/register").permitAll()
-            .requestMatchers("/api/users/login").permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form
-            .loginPage("/api/users/login")  // Disabilita la pagina di login predefinita
-            .loginProcessingUrl("/api/users/login")
-            .usernameParameter("email")
-            .passwordParameter("password")
-            .successHandler((request, response, authentication) -> {
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                Utente user = (Utente) authentication.getPrincipal();
-                // Rimuovi la password dalla risposta per sicurezza
-                user.setPassword(null);
-                new ObjectMapper().writeValue(response.getWriter(), user);
-            })
-            .failureHandler((request, response, exception) -> {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter().write("{\"error\":\"Login failed\",\"message\":\"" + exception.getMessage() + "\"}");
-            })
-        )
-        .logout(logout -> logout
-            .logoutUrl("/api/users/logout")
-            .logoutSuccessHandler((request, response, authentication) -> {
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter().write("{\"message\":\"Logout successful\"}");
-            })
-            .deleteCookies("JSESSIONID")
-        )
-        .exceptionHandling(exceptions -> exceptions
-            .authenticationEntryPoint((request, response, authException) -> {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
-            })
-        )
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-        );
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers("/api/users/login").permitAll()
+                        .requestMatchers("/api/documents/**").authenticated()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/api/users/login") // Disabilita la pagina di login predefinita
+                        .loginProcessingUrl("/api/users/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .successHandler((request, response, authentication) -> {
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            Utente user = (Utente) authentication.getPrincipal();
+                            // Rimuovi la password dalla risposta per sicurezza
+                            user.setPassword(null);
+                            new ObjectMapper().writeValue(response.getWriter(), user);
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter().write(
+                                    "{\"error\":\"Login failed\",\"message\":\"" + exception.getMessage() + "\"}");
+                        }))
+                .logout(logout -> logout
+                        .logoutUrl("/api/users/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter().write("{\"message\":\"Logout successful\"}");
+                        })
+                        .deleteCookies("JSESSIONID"))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter()
+                                    .write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
+                        }))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
-    return http.build();
-}
+        return http.build();
+    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

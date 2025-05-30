@@ -42,7 +42,7 @@ public class DocumentController {
     // e ai campi del metodo
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDocument(
-            @RequestParam("file") MultipartFile file,
+            @RequestParam("data") MultipartFile file,
             //@RequestParam("user_id") int userId,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
