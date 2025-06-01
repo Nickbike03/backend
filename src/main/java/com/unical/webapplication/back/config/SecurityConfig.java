@@ -66,7 +66,6 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             Utente user = (Utente) authentication.getPrincipal();
-                            // Rimuovi la password dalla risposta per sicurezza
                             user.setPassword(null);
                             new ObjectMapper().writeValue(response.getWriter(), user);
                         })
@@ -96,7 +95,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ---- QUESTO È IL NUOVO METODO PER CORS ----
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
