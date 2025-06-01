@@ -71,7 +71,7 @@ public class DocumentController {
 
     // questo metodo ritorna il document per come è caricato nel DB, compreso il
     // campo data del document
-    @GetMapping("open/documents/{id}")
+    @GetMapping("auth/documents/{id}")
     public ResponseEntity<?> getDocument(@PathVariable int id) {
         try {
             Document document = documentService.getDocument(id);
