@@ -26,7 +26,7 @@ import com.unical.webapplication.back.service.DocumentService;
 
 
 @RestController
-@RequestMapping("/api/documents") // potremi modificare d a questo punto per poter permettere il login in base al
+@RequestMapping("/api") // potremi modificare d a questo punto per poter permettere il login in base al
                                   // ruolo che si ricopre
 @CrossOrigin(origins = "http://localhost:4200")            
 public class DocumentController {
@@ -40,7 +40,7 @@ public class DocumentController {
 
     // Questo metodo permerre di caricare un document. Prestare attenzione al'ordine
     // e ai campi del metodo
-    @PostMapping("/upload")
+    @PostMapping("auth/documents/upload")
     public ResponseEntity<?> uploadDocument(
             @RequestParam("data") MultipartFile file,
             //@RequestParam("user_id") int userId,
@@ -53,7 +53,7 @@ public class DocumentController {
         // vedere di implementare un DTO per la gestione del body degli oggetti passati tramite la query
         
         try {
-            int userId = 3;
+            int userId = 3; // Nico ricordati di risolvere questa cosa appena il codice funziona
             Document document = new Document(
                     userId,
                     name,
@@ -71,7 +71,7 @@ public class DocumentController {
 
     // questo metodo ritorna il document per come è caricato nel DB, compreso il
     // campo data del document
-    @GetMapping("/{id}")
+    @GetMapping("open/documents/{id}")
     public ResponseEntity<?> getDocument(@PathVariable int id) {
         try {
             Document document = documentService.getDocument(id);
@@ -96,7 +96,7 @@ public class DocumentController {
 
     // Questo metodo ritorna solo il campo "data" del document, per ottimizzare il
     // download del documento
-    @GetMapping("/download/{id}")
+    @GetMapping("auth/documents/download/{id}")
     public ResponseEntity<?> downloadDocument(@PathVariable int id) {
         try {
             Document document = documentService.downloadDocument(id);
@@ -118,7 +118,7 @@ public class DocumentController {
 
     // questo metodo ritorna il document per come è caricato nel DB, compreso il
     // campo data del document
-    @GetMapping("/valid/{id}")
+    @GetMapping("open/documents/valid/{id}")
     public ResponseEntity<?> getValidDocument(@PathVariable int id) {
         try {
             Document document = documentService.getValidDocument(id);
@@ -132,7 +132,7 @@ public class DocumentController {
 
     // questo metodo ritorna il document per come è caricato nel DB, compreso il
     // campo data del document
-    @GetMapping("/not-valid/{id}")
+    @GetMapping("open/documents/not-valid/{id}")
     public ResponseEntity<?> getNotValidDocument(@PathVariable int id) {
         try {
             Document document = documentService.getNotValidDocument(id);
@@ -148,7 +148,7 @@ public class DocumentController {
     // migliorare l'efficenza delle operazioni.
     // Se si desidera avere anche il compo data bisogna utilizzare i metodi che
     // ritornano solo un documento nello specifico
-    @GetMapping
+    @GetMapping("/open/documents")
     public ResponseEntity<?> getAllDocuments() {
         try {
             List<Document> documents = documentService.findAllDocuments();
@@ -163,7 +163,7 @@ public class DocumentController {
     // migliorare l'efficenza delle operazioni.
     // Se si desidera avere anche il compo data bisogna utilizzare i metodi che
     // ritornano solo un documento nello specifico
-    @GetMapping("/valid")
+    @GetMapping("open/documents/valid")
     public ResponseEntity<?> getAllValidDocuments() {
         try {
             List<Document> documents = documentService.getValidDocuments();
@@ -178,7 +178,7 @@ public class DocumentController {
     // migliorare l'efficenza delle operazioni.
     // Se si desidera avere anche il compo data bisogna utilizzare i metodi che
     // ritornano solo un documento nello specifico
-    @GetMapping("/not-valid")
+    @GetMapping("auth/documents/not-valid")
     public ResponseEntity<?> getAllNotValidDocuments() {
         try {
             List<Document> documents = documentService.getNotValidDocuments();
@@ -194,7 +194,7 @@ public class DocumentController {
     // Se si desidera avere anche il compo data bisogna utilizzare i metodi che
     // ritornano solo un documento nello specifico.
     // ATTENZIONE: Anche se lo userId non esiste viene restituita una lista vuota
-    @GetMapping("/user/{userId}")
+    @GetMapping("auth/documents/user/{userId}")
     public ResponseEntity<?> getDocumentsByUser(@PathVariable int userId) {
         try {
             List<Document> documents = documentService.getDocumentsByUserId(userId);
@@ -205,7 +205,7 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/course/{courseName}")
+    @GetMapping("open/documents/course/{courseName}")
     public ResponseEntity<?> getDocumentsByCourse(@PathVariable String courseName) {
         try {
             List<Document> documents = documentService.getDocumentsByCourse(courseName);
@@ -216,7 +216,7 @@ public class DocumentController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("auth/documents/{id}")
     public ResponseEntity<?> deleteDocument(@PathVariable int id) {
         try {
             boolean deleted = documentService.deleteDocument(id);
@@ -230,7 +230,7 @@ public class DocumentController {
         }
     }
 
-    @PatchMapping("/{documentId}/validate/{adminId}")
+    @PatchMapping("admin/documents/{documentId}/validate/{adminId}")
     public ResponseEntity<?> validateDocument(
             @PathVariable int documentId,
             @PathVariable int adminId) {
