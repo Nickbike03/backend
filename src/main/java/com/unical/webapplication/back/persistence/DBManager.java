@@ -17,7 +17,7 @@ public class DBManager {
         config.setPassword("1234");
         
         // Configurazioni ottimali per il pool
-        config.setMaximumPoolSize(10);       // Numero massimo di connessioni
+        config.setMaximumPoolSize(100);       // Numero massimo di connessioni
         config.setMinimumIdle(5);            // Numero minimo di connessioni inattive
         config.setConnectionTimeout(30000);  // 30 secondi di timeout
         config.setIdleTimeout(600000);       // 10 minuti di inattività

@@ -71,7 +71,7 @@ public class DocumentController {
 
     // questo metodo ritorna il document per come è caricato nel DB, compreso il
     // campo data del document
-    @GetMapping("auth/documents/{id}")
+    @GetMapping("open/documents/{id}")
     public ResponseEntity<?> getDocument(@PathVariable int id) {
         try {
             Document document = documentService.getDocument(id);
@@ -102,7 +102,7 @@ public class DocumentController {
             Document document = documentService.downloadDocument(id);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON   ); // ritorna il documento come un json
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM   ); // ritorna il documento come un json
             headers.setContentDisposition(ContentDisposition.attachment()
                     .filename(document.getName())
                     .build());

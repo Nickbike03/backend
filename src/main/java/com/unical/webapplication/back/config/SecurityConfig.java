@@ -10,10 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import org.springframework.web.cors.CorsConfiguration;          // import cors
-import org.springframework.web.cors.CorsConfigurationSource; // import cors
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // import cors
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unical.webapplication.back.model.Utente;
@@ -31,16 +30,31 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
+    //Impostazione che mi permette di disabilitare tutti i controlli per il login e riporta l'applicazione ad una versione senza sicurezza
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+    // Exception {
+    // http
+    // .csrf(csrf -> csrf.disable())
+    // .authorizeHttpRequests(auth -> auth
+    // .anyRequest().permitAll()
+    // )
+    // // se vuoi la form-login di default (opzionale)
+    // .httpBasic(Customizer.withDefaults());
+
+    // return http.build();
+    // }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(); // <----- ABILITA CORS QUI
-
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/open/**").permitAll()
+                        .requestMatchers("/api/auth/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/users/login").permitAll()
-                        .requestMatchers("/api/documents/**").authenticated()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/api/users/login") // Disabilita la pagina di login predefinita
@@ -50,7 +64,6 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             Utente user = (Utente) authentication.getPrincipal();
-                            // Rimuovi la password dalla risposta per sicurezza
                             user.setPassword(null);
                             new ObjectMapper().writeValue(response.getWriter(), user);
                         })
@@ -80,7 +93,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ---- QUESTO È IL NUOVO METODO PER CORS ----
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -88,11 +100,13 @@ public class SecurityConfig {
         configuration.addAllowedMethod("*"); // tutti i metodi (GET, POST...)
         configuration.addAllowedHeader("*"); // tutte le intestazioni
         configuration.setAllowCredentials(true); // cookie / sessione
-
+ 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration); // API protette
         return source;
     }
+
+    
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
