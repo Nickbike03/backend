@@ -102,7 +102,7 @@ public class DocumentController {
             Document document = documentService.downloadDocument(id);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM   ); // ritorna il documento come uno stream di dati
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM); // ritorna il documento come uno stream di dati
             headers.setContentDisposition(ContentDisposition.attachment()
                     .filename(document.getName())
                     .build());
