@@ -3,6 +3,8 @@ package com.unical.webapplication.back.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,4 +42,16 @@ public class UtenteController {
         return ResponseEntity.status(401).build();
     }
 
+    @GetMapping("/check-session")
+    public ResponseEntity<?> checkSession() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+ 
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+            Utente user = (Utente) authentication.getPrincipal();
+            user.setPassword(null);
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sessione non valida");
+        }
+    }
 }

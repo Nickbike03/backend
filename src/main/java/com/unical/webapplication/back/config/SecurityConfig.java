@@ -47,50 +47,51 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors();
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/open/**").permitAll()
-                        .requestMatchers("/api/auth/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users/register").permitAll()
-                        .requestMatchers("/api/users/login").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/api/users/login") // Disabilita la pagina di login predefinita
-                        .loginProcessingUrl("/api/users/login")
-                        .usernameParameter("email")
-                        .passwordParameter("password")
-                        .successHandler((request, response, authentication) -> {
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            Utente user = (Utente) authentication.getPrincipal();
-                            user.setPassword(null);
-                            new ObjectMapper().writeValue(response.getWriter(), user);
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.getWriter().write(
-                                    "{\"error\":\"Login failed\",\"message\":\"" + exception.getMessage() + "\"}");
-                        }))
-                .logout(logout -> logout
-                        .logoutUrl("/api/users/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.getWriter().write("{\"message\":\"Logout successful\"}");
-                        })
-                        .deleteCookies("JSESSIONID"))
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.getWriter()
-                                    .write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
-                        }))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
-
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/open/**").permitAll()
+                .requestMatchers("/api/auth/**").authenticated()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/users/register").permitAll()
+                .requestMatchers("/api/users/login").permitAll()
+                .requestMatchers("/api/users/check-session").permitAll()
+                .anyRequest().authenticated())
+            .formLogin(form -> form
+                .loginPage("/api/users/login") // Disabilita la pagina di login predefinita
+                .loginProcessingUrl("/api/users/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler((request, response, authentication) -> {
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    Utente user = (Utente) authentication.getPrincipal();
+                    user.setPassword(null); 
+                    new ObjectMapper().writeValue(response.getWriter(), user);
+                })
+                .failureHandler((request, response, exception) -> {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.getWriter().write(
+                            "{\"error\":\"Login failed\",\"message\":\"" + exception.getMessage() + "\"}");
+                }))
+            .logout(logout -> logout
+                .logoutUrl("/api/users/logout")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.getWriter().write("{\"message\":\"Logout successful\"}");
+                })
+                .deleteCookies("JSESSIONID"))
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.getWriter()
+                            .write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
+                }))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable());
+    
         return http.build();
     }
 
@@ -107,8 +108,6 @@ public class SecurityConfig {
         return source;
     }
 
-    
-
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -116,5 +115,4 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
-
 }
