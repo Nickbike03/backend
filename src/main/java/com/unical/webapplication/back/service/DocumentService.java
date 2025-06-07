@@ -86,12 +86,6 @@ public class DocumentService {
         if (doc == null) {
             throw new RuntimeException("Document not found");
         }
-
-        // // Verifica esistenza admin (opzionale ma consigliato)
-        // if (!adminDAO.adminExists(adminId)) { // Supponendo l'esistenza di AdminDAO
-        //     throw new RuntimeException("Admin not found");
-        // }
-
         return documentDAO.updateValid(documentId, adminId);
     }
 }

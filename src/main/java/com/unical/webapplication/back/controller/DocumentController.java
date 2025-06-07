@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.unical.webapplication.back.model.Document;
+import com.unical.webapplication.back.model.DocumentJsonResponse;
 import com.unical.webapplication.back.service.DocumentService;
+import com.unical.webapplication.back.utility.FileTypeUtility;
 
 
 @RestController
@@ -113,6 +115,41 @@ public class DocumentController {
             return ResponseEntity.notFound().build();
         } catch (SQLException e) {
             return ResponseEntity.internalServerError().body("Error downloading document: " + e.getMessage());
+        }
+    }
+
+     @GetMapping("auth/documents/download-json/{id}")
+    public ResponseEntity<?> downloadDocumentAsJson(@PathVariable int id) {
+        try {
+            Document document = documentService.getDocument(id);
+            byte[] fileData = document.getData();
+            
+            // Genera nome file corretto
+            String safeFileName = FileTypeUtility.buildSafeFileName(
+                document.getName(), 
+                fileData
+            );
+            
+            // Estrai estensione
+            String fileExtension = FileTypeUtility.detectFileExtension(fileData);
+            
+            // Converti in Base64
+            String base64Content = java.util.Base64.getEncoder().encodeToString(fileData);
+            
+            // Crea risposta JSON
+            DocumentJsonResponse response = new DocumentJsonResponse(
+                safeFileName, 
+                fileExtension, 
+                base64Content
+            );
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("Errore nel download JSON: " + e.getMessage());
         }
     }
 
