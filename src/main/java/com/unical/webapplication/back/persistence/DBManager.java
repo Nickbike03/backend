@@ -12,7 +12,7 @@ public class DBManager {
 
     static {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/notes4unical");
+        config.setJdbcUrl("jdbc:postgresql://localhost:5432/notes4unical1");
         config.setUsername("postgres");
         config.setPassword("1234");
         
