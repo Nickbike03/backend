@@ -45,7 +45,7 @@ public class DocumentController {
     @PostMapping("auth/documents/upload")
     public ResponseEntity<?> uploadDocument(
             @RequestParam("data") MultipartFile file,
-            //@RequestParam("user_id") int userId,
+            @RequestParam("user_id") int userId,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("course") String course) {
@@ -55,7 +55,6 @@ public class DocumentController {
         // vedere di implementare un DTO per la gestione del body degli oggetti passati tramite la query
         
         try {
-            int userId = 3; // Nico ricordati di risolvere questa cosa appena il codice funziona
             Document document = new Document(
                     userId,
                     name,
