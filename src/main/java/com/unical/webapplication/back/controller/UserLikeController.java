@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.unical.webapplication.back.model.Document;
 import com.unical.webapplication.back.service.UserLikeService;
 
 @RestController
-@RequestMapping("/api/likes")
+@RequestMapping("/api/auth/likes")
 public class UserLikeController {
 
     private final UserLikeService likeService;
@@ -28,7 +29,7 @@ public class UserLikeController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getLikedDocumentsByUser(@PathVariable int userId) {
         try {
-            List<Integer> likedDocuments = likeService.getLikedDocumentsByUser(userId);
+            List<Document> likedDocuments = likeService.getLikedDocumentsByUser(userId);
             return ResponseEntity.ok(likedDocuments);
         } catch (SQLException e) {
             return ResponseEntity.internalServerError()

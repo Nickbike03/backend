@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.unical.webapplication.back.model.Document;
 import com.unical.webapplication.back.persistence.implementation.UserLikeDocumentsDaoImpl;
 
 @Service
@@ -17,7 +18,7 @@ public class UserLikeService {
         this.likeDao = likeDao;
     }
 
-    public List<Integer> getLikedDocumentsByUser(int userId) throws SQLException {
+    public List<Document> getLikedDocumentsByUser(int userId) throws SQLException {
         return likeDao.getLikesByUser(userId);
     }
 

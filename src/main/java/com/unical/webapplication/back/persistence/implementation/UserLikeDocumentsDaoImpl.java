@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.unical.webapplication.back.model.Document;
 import com.unical.webapplication.back.persistence.DAO.ILikeDocumentDAO;
 import com.unical.webapplication.back.persistence.DBManager;
 
@@ -21,21 +22,32 @@ public class UserLikeDocumentsDaoImpl implements ILikeDocumentDAO{
    
 
     @Override
-    public List<Integer> getLikesByUser(int userId) throws SQLException {
-        List<Integer> likedDocuments = new ArrayList<>();
-        String sql = "SELECT document_id FROM user_like_documents WHERE user_id = ?";
-        
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+    public List<Document> getLikesByUser(int userId) throws SQLException {
+        List<Document> documents = new ArrayList<>();
+        String sql = "SELECT id, d.user_id, validated_admin, name, data, description, course, size, validated from \"document\" d , user_like_documents uld  WHERE d.id = uld.user_id and uld.user_id = ?";
+
+        try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, userId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    likedDocuments.add(rs.getInt("document_id"));
+                    Document doc = new Document();
+                    doc.setId(rs.getInt("id"));
+                    doc.setUser_id(rs.getInt("user_id"));
+                    doc.setData(rs.getBytes("data"));
+                    doc.setValidated_admin(rs.getInt("validated_admin"));
+                    doc.setName(rs.getString("name"));
+                    doc.setDescription(rs.getString("description"));
+                    doc.setCourse(rs.getString("course"));
+                    doc.setSize(rs.getInt("size"));
+                    doc.setValidated(rs.getBoolean("validated"));
+
+                    documents.add(doc);
                 }
             }
         }
-        return likedDocuments;
+        return documents;
+    
     }
 
     @Override
