@@ -24,7 +24,7 @@ public class UserLikeDocumentsDaoImpl implements ILikeDocumentDAO{
     @Override
     public List<Document> getLikesByUser(int userId) throws SQLException {
         List<Document> documents = new ArrayList<>();
-        String sql = "SELECT id, d.user_id, validated_admin, name, data, description, course, size, validated from \"document\" d , user_like_documents uld  WHERE d.id = uld.user_id and uld.user_id = ?";
+        String sql = "SELECT d.id, d.user_id, validated_admin, d.name, data, description, course, size, validated from document d , user_like_documents uld, utente u   WHERE d.id = uld.document_id and u.id = uld.user_id and u.id = ?";
 
         try (PreparedStatement stmt = DBManager.getConnection().prepareStatement(sql)) {
             stmt.setInt(1, userId);
