@@ -274,7 +274,7 @@ public class DocumentController {
         try {
             boolean updated = documentService.validateDocument(documentId, adminId);
             if (updated) {
-                return ResponseEntity.ok().body("Document validated successfully");
+                return ResponseEntity.noContent().build();
             }
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         } catch (RuntimeException e) {

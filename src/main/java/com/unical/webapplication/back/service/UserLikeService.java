@@ -26,6 +26,9 @@ public class UserLikeService {
         return likeDao.insertLike(userId, documentId);
     }
     
+    public boolean deleteLike (int userId, int documentId) throws  SQLException{
+        return likeDao.deleteLike(userId, documentId);
+    }
 }
 
 

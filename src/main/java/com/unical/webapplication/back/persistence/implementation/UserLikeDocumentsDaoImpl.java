@@ -66,4 +66,21 @@ public class UserLikeDocumentsDaoImpl implements ILikeDocumentDAO{
             return false;
         }
     }
+
+    public boolean deleteLike(int userId, int documentId) throws SQLException{
+        String sql = "DELETE FROM user_like_documents " +
+             "WHERE user_id = (SELECT id FROM utente WHERE id= ?) " +
+             "AND document_id = (SELECT id FROM document WHERE id = ?)";
+         try (Connection conn = DBManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            stmt.setInt(2, documentId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return false;
+        }
+    }
 }
